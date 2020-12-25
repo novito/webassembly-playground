@@ -1,7 +1,5 @@
 (module
   (memory $mem 1) ;; indicates that the memory allocated must have at least 1 page (65 KB) of space
-)
-
 ;; In order to store the state of the checkers board game, we need (ideally) an 8x8 data structure
 ;; what comes to mind is a multi-dimensional array, but that doesn't exist in wasm. All we have is linear memory.
 ;; So the question is, how can we use linear memory to represent what would be a multi-dimensional array?
@@ -79,4 +77,12 @@
 ;; Removes a crown from a given piece (no mutation)
 (func $withoutCrown (param $piece i32) (result i32)
   (i32.and (get_local $piece) (i32.const 3)) 
+)
+
+(export "offsetForPosition" (func $offsetForPosition))
+(export "isCrowned" (func $isCrowned))
+(export "isWhite" (func $isWhite))
+(export "isBlack" (func $isBlack))
+(export "withCrown" (func $withCrown))
+(export "withoutCrown" (func $withoutCrown))
 )
