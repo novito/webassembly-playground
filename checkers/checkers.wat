@@ -43,7 +43,7 @@
 ;; How would I represent if the cell has a white-crowned piece? 2+4 = 6
 ;; So, maximum we are going to be using just 3 bits per cell!
 ;; Let's write some functions that will use bitwise operators to act upon these cells
-
+;; Notice that these functions don't change the memory slot value. They just return new integers
 
 (global $WHITE i32 (i32.const 2)) 
 (global $BLACK i32 (i32.const 1)) 
@@ -62,17 +62,21 @@
 )
 ;; Determine if a piece is white
 (func $isWhite (param $piece i32) (result i32)
-(i32.eq
-(i32.and (get_local $piece) (get_global $WHITE)) (get_global $WHITE)
-) )
+  (i32.eq
+    (i32.and (get_local $piece) (get_global $WHITE)) (get_global $WHITE)
+  ) 
+)
 ;; Determine if a piece is black
 (func $isBlack (param $piece i32) (result i32)
-(i32.eq
-(i32.and (get_local $piece) (get_global $BLACK)) (get_global $BLACK)
-) )
+  (i32.eq
+    (i32.and (get_local $piece) (get_global $BLACK)) (get_global $BLACK)
+  ) 
+)
 ;; Adds a crown to a given piece (no mutation)
 (func $withCrown (param $piece i32) (result i32)
-(i32.or (get_local $piece) (get_global $CROWN)) )
+  (i32.or (get_local $piece) (get_global $CROWN)) 
+)
 ;; Removes a crown from a given piece (no mutation)
 (func $withoutCrown (param $piece i32) (result i32)
-(i32.and (get_local $piece) (i32.const 3)) )
+  (i32.and (get_local $piece) (i32.const 3)) 
+)
