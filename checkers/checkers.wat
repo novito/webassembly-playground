@@ -42,3 +42,37 @@
 ;; How would I represent if the cell has a black-crowned piece? 1+4 = 5
 ;; How would I represent if the cell has a white-crowned piece? 2+4 = 6
 ;; So, maximum we are going to be using just 3 bits per cell!
+;; Let's write some functions that will use bitwise operators to act upon these cells
+
+
+(global $WHITE i32 (i32.const 2)) 
+(global $BLACK i32 (i32.const 1)) 
+(global $CROWN i32 (i32.const 4))
+
+;; Determine if a piece has been crowned
+;; We perform an AND bitwise operation, between the cell value and the CROWN mask (010), if the result is the CROWN mask, then it means that cell is crowned.
+;; Example: Black and crowned = 1+4 = 101 - So, we do the AND operation: 101 & 010 = 010 => YES, it's crowned
+;; Example: White and crowned = 2+4 = 110 - So, we do the AND operation: 110 & 010 = 010 => YES, it's crowned
+;; Example: Black and not crowned = 001 - So, we do the AND operation: 001 & 010 = 000 => Nopes, not crowned!
+(func $isCrowned (param $piece i32) (result i32)
+  (i32.eq
+    (i32.and (get_local $piece) (get_global $CROWN)) 
+    (get_global $CROWN)
+  ) 
+)
+;; Determine if a piece is white
+(func $isWhite (param $piece i32) (result i32)
+(i32.eq
+(i32.and (get_local $piece) (get_global $WHITE)) (get_global $WHITE)
+) )
+;; Determine if a piece is black
+(func $isBlack (param $piece i32) (result i32)
+(i32.eq
+(i32.and (get_local $piece) (get_global $BLACK)) (get_global $BLACK)
+) )
+;; Adds a crown to a given piece (no mutation)
+(func $withCrown (param $piece i32) (result i32)
+(i32.or (get_local $piece) (get_global $CROWN)) )
+;; Removes a crown from a given piece (no mutation)
+(func $withoutCrown (param $piece i32) (result i32)
+(i32.and (get_local $piece) (i32.const 3)) )
