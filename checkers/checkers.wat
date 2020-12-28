@@ -1,5 +1,6 @@
 (module
   (memory $mem 1) ;; indicates that the memory allocated must have at least 1 page (65 KB) of space
+  (global $currentTurn (mut i32) (i32.const 0)) ;; indicates the currentTurn (player 1 (black) or 2 (white)). Initially set to 0. 
 ;; In order to store the state of the checkers board game, we need (ideally) an 8x8 data structure
 ;; what comes to mind is a multi-dimensional array, but that doesn't exist in wasm. All we have is linear memory.
 ;; So the question is, how can we use linear memory to represent what would be a multi-dimensional array?
@@ -77,6 +78,88 @@
 ;; Removes a crown from a given piece (no mutation)
 (func $withoutCrown (param $piece i32) (result i32)
   (i32.and (get_local $piece) (i32.const 3)) 
+)
+
+;; Sets a piece on the board.
+(func $setPiece (param $x i32) (param $y i32) (param $piece i32)
+  ;; i31.store Stores a 32-bit integer in a memory address
+  (i32.store
+    (call $offsetForPosition
+      (get_local $x)
+      (get_local $y)
+    )
+    (get_local $piece)
+  )
+)
+
+;; Gets a piece from the board. Out of range causes a trap 
+(func $getPiece (param $x i32) (param $y i32) (result i32)
+  (if (result i32)
+    (block (result i32)
+      (i32.and
+        (call $inRange
+          (i32.const 0) 
+          (i32.const 7) 
+          (get_local $x)
+        )
+        (call $inRange
+          (i32.const 0) 
+          (i32.const 7) 
+          (get_local $y)
+        ) 
+      )
+    ) 
+  (then
+    (i32.load
+      (call $offsetForPosition
+        (get_local $x)
+        (get_local $y))
+    )
+  ) 
+  (else
+    (unreachable)
+  )
+  ) 
+)
+
+
+;; Detect if values are within range (inclusive high and low)
+;; This is not a high-level programming language that will check out of memory bounds stuff for us
+;; we gotta do it ourselves!
+(func $inRange (param $low i32) (param $high i32)
+               (param $value i32) (result i32)
+  (i32.and
+    (i32.ge_s (get_local $value) (get_local $low)) 
+    (i32.le_s (get_local $value) (get_local $high))
+  ) 
+)
+
+;; Gets the current turn owner (white or black)
+(func $getTurnOwner (result i32)
+    (get_global $currentTurn)
+)
+;; At the end of a turn, switch turn owner to the other player
+(func $toggleTurnOwner
+  (if (i32.eq (call $getTurnOwner) (i32.const 1)) 
+    (then (call $setTurnOwner (i32.const 2))) 
+    (else (call $setTurnOwner (i32.const 1)))
+  ) 
+)
+;; Sets the turn owner
+(func $setTurnOwner (param $piece i32)
+  (set_global $currentTurn (get_local $piece))
+)
+
+;; Determine if it's a player's turn
+(func $isPlayersTurn (param $player i32) (result i32)
+  ;; this is a greater than zero comparison
+  (i32.gt_s
+    ;; we are doing a bitwise AND operation, to account when player value is crowned too.
+    ;; For example, if turnOwner is 0001 (black) and player is 0101 (black crown), we will do 0101 AND 0001 = 0001, which is bigger than 0.
+    ;; if turnOwner is 0001 (black) and player is 0110 (white crown), we will do 0110 AND 0001 = 0, which is not bigger than zero, or in other words, not white's turn
+    (i32.and (get_local $player) (call $getTurnOwner)) 
+    (i32.const 0)
+  ) 
 )
 
 (export "offsetForPosition" (func $offsetForPosition))
