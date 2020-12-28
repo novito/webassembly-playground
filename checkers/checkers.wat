@@ -162,6 +162,44 @@
   ) 
 )
 
+;; Should this piece get crowned?
+;; We crown black pieces in row 0, white pieces in row 7
+(func $shouldCrown (param $pieceY i32) (param $piece i32) (result i32)
+  (i32.or 
+    (i32.and
+      (i32.eq
+        (get_local $pieceY) 
+        (i32.const 0)
+      )
+      (call $isBlack (get_local $piece))
+    )
+    (i32.and 
+      (i32.eq
+        (get_local $pieceY)
+        (i32.const 7) 
+      )
+      (call $isWhite (get_local $piece))
+    )
+  ) 
+)
+;; Converts a piece into a crowned piece and invokes
+;; a host notifier
+(func $crownPiece (param $x i32) (param $y i32)
+  (local $piece i32) ;; declares a local variable that will be visible just in this function scope
+  ;; set_local sets the value of that local variable
+  ;; in high level languages that we declare and set a variable, actually behind the scenes are also declaring and setting as separate instructions
+  (set_local $piece (call $getPiece (get_local $x)(get_local $y)))
+  ;; the result of (call $withCrown) is the third parameter of setPiece
+  (call $setPiece (get_local $x) (get_local $y) (call $withCrown (get_local $piece)))
+  ;; nothing right now. This will be used to communicate with HOST once a piece is crowned 
+  ;; so that the host can do whatever (for example print a crown on top of the piece in the UI)
+  (call $notify_piececrowned (get_local $x)(get_local $y))
+)
+
+(func $distance (param $x i32)(param $y i32)(result i32) 
+  (i32.sub (get_local $x) (get_local $y))
+)
+
 (export "offsetForPosition" (func $offsetForPosition))
 (export "isCrowned" (func $isCrowned))
 (export "isWhite" (func $isWhite))
