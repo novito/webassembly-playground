@@ -247,6 +247,42 @@
     (i32.const 2)
   ) 
 )
+
+;; Actually move the piece
+(func $move (param $fromX i32) (param $fromY i32)
+            (param $toX i32) (param $toY i32) (result i32)
+  (if (result i32)
+    (block (result i32)
+      (call $isValidMove (get_local $fromX) (get_local $fromY)
+                         (get_local $toX) (get_local $toY))
+    ) 
+    (then
+      (call $do_move (get_local $fromX) (get_local $fromY)
+                     (get_local $toX) (get_local $toY))
+    ) 
+    (else
+      (i32.const 0) 
+    )
+  ) 
+)
+
+;; Internal move function, performs actual move post-validation of target. ;; Currently not handled:
+;; - removing opponent piece during a jump
+;; - detecting win condition
+(func $do_move (param $fromX i32) (param $fromY i32)
+               (param $toX i32) (param $toY i32) (result i32)
+  (local $curpiece i32)
+  (set_local $curpiece (call $getPiece (get_local $fromX)(get_local $fromY)))
+  (call $toggleTurnOwner)
+  (call $setPiece (get_local $toX) (get_local $toY) (get_local $curpiece)) 
+  (call $setPiece (get_local $fromX) (get_local $fromY) (i32.const 0))
+  (if (call $shouldCrown (get_local $toY) (get_local $curpiece))
+    (then (call $crownPiece (get_local $toX) (get_local $toY))))
+  (call $notify_piecemoved (get_local $fromX) (get_local $fromY)
+                            (get_local $toX) (get_local $toY))
+  (i32.const 1) 
+)
+
 (export "offsetForPosition" (func $offsetForPosition))
 (export "isCrowned" (func $isCrowned))
 (export "isWhite" (func $isWhite))
