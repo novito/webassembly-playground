@@ -1,6 +1,6 @@
 My playground for WebAssembly text format!
 
-# How to build a WebAssembly Application?
+# How did I build this WebAssembly Application?
 
 I used the WebAssembly Binary Toolkit. In order to install the toolkit, you need to follow these steps (if you are running MacOS):
 
