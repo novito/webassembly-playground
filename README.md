@@ -1,4 +1,4 @@
-My playground for WebAssembly text format!
+My playground to learn WebAssembly text format by creating a "checkers game".
 
 # How did I build this WebAssembly Application?
 
