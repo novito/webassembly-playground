@@ -1,4 +1,5 @@
 (module
+  ;; how to import: https://developer.mozilla.org/en-US/docs/WebAssembly/Understanding_the_text_format#Importing_functions_from_JavaScript
   (import "events" "piecemoved"
         (func $notify_piecemoved (param $fromX i32) (param $fromY i32)
                                  (param $toX i32) (param $toY i32)))
@@ -300,7 +301,6 @@
 )
 
 (export "offsetForPosition" (func $offsetForPosition))
-(export "isCrowned" (func $isCrowned))
 (export "isWhite" (func $isWhite))
 (export "isBlack" (func $isBlack))
 (export "withCrown" (func $withCrown))

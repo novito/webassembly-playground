@@ -13,8 +13,10 @@ fetch('./checkers.wasm').then(response =>
 }
 )).then(results => {
   instance = results.instance;
-  instance.exports.initBoard(); console.log("At start, turn owner is " +
-  instance.exports.getTurnOwner());
+  instance.exports.initBoard(); 
+  console.log("At start, turn owner is " +
+    instance.exports.getTurnOwner()
+  );
   instance.exports.move(0, 5, 0, 4); // B 
   instance.exports.move(1, 0, 1, 1); // W 
   instance.exports.move(0, 4, 0, 3); // B 
