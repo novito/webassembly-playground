@@ -1,4 +1,9 @@
 (module
+  (import "events" "piecemoved"
+        (func $notify_piecemoved (param $fromX i32) (param $fromY i32)
+                                 (param $toX i32) (param $toY i32)))
+  (import "events" "piececrowned"
+        (func $notify_piececrowned (param $pieceX i32) (param $pieceY i32)))
   (memory $mem 1) ;; indicates that the memory allocated must have at least 1 page (65 KB) of space
   (global $currentTurn (mut i32) (i32.const 0)) ;; indicates the currentTurn (player 1 (black) or 2 (white)). Initially set to 0. 
 ;; In order to store the state of the checkers board game, we need (ideally) an 8x8 data structure
@@ -283,10 +288,27 @@
   (i32.const 1) 
 )
 
+;; Manually place each piece on the board to initialize the game
+(func $initBoard
+  ;; Place the white pieces at the top of the board
+  (call $setPiece (i32.const 1) (i32.const 0) (i32.const 2)) 
+  (call $setPiece (i32.const 3) (i32.const 0) (i32.const 2)) 
+  (call $setPiece (i32.const 5) (i32.const 0) (i32.const 2)) 
+  (call $setPiece (i32.const 7) (i32.const 0) (i32.const 2))
+  ;; I need to set more of these
+  (call $setTurnOwner (i32.const 1)) ;; Black goes first 
+)
+
 (export "offsetForPosition" (func $offsetForPosition))
 (export "isCrowned" (func $isCrowned))
 (export "isWhite" (func $isWhite))
 (export "isBlack" (func $isBlack))
 (export "withCrown" (func $withCrown))
 (export "withoutCrown" (func $withoutCrown))
+(export "getPiece" (func $getPiece))
+(export "isCrowned" (func $isCrowned))
+(export "initBoard" (func $initBoard))
+(export "getTurnOwner" (func $getTurnOwner))
+(export "move" (func $move))
+(export "memory" (memory $mem))
 )
